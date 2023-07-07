@@ -199,6 +199,8 @@ impl<'a> Value<'a> {
         json
     }
 
+    pub fn index(&self) -> Option<usize> { self.index }
+
     pub fn exists(&self) -> bool {
         self.json().len() > 0
     }
@@ -1080,7 +1082,7 @@ pub fn get<'a>(json: &'a str, path: &'a str) -> Value<'a> {
 /// Searches json for the specified path.
 /// Works the same as `get` except that the input json is a a byte slice
 /// instead of a string.
-/// 
+///
 /// # Safety
 ///
 /// This function is unsafe because it does not check that the bytes passed to
