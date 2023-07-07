@@ -9,6 +9,33 @@
 use super::*;
 
 #[test]
+fn index() {
+    let paths = vec![
+        "statuses.0.user.name", // string
+        "statuses.0.user.id", // number
+        "statuses.0.metadata", // object
+        "statuses.0.entities.user_mentions", // array
+        "statuses.0.user.protected", // bool
+        "statuses.0.user.url", // null
+    ];
+
+    let json = std::fs::read_to_string("testfiles/twitter.json").unwrap();
+
+    for p in paths {
+        eprintln!("testing JSON path {}", p);
+
+        let field = get(&json, p);
+        assert_eq!(field.exists(), true);
+
+        let field_begin = field.index().unwrap();
+        let field_len = field.json().len();
+        let field_end = field_begin + field_len;
+
+        assert_eq!(json[field_begin..field_end], *field.json());
+    }
+}
+
+#[test]
 fn various() {
     let json = std::fs::read_to_string("testfiles/twitter.json").unwrap();
     assert_eq!(get(&json, "@valid.statuses.#").u64(), 100);
@@ -281,14 +308,14 @@ fn array_value() {
     {
         "programmers": [
           {
-            "firstName": "Janet", 
-            "lastName": "McLaughlin", 
+            "firstName": "Janet",
+            "lastName": "McLaughlin",
           }, {
-            "firstName": "Elliotte", 
-            "lastName": "Hunter", 
+            "firstName": "Elliotte",
+            "lastName": "Hunter",
           }, {
-            "firstName": "Jason", 
-            "lastName": "Harold", 
+            "firstName": "Jason",
+            "lastName": "Harold",
           }
         ]
       }
