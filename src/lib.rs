@@ -15,8 +15,7 @@ mod valid;
 use path::*;
 use std::cmp::Ordering;
 use std::fmt;
-use std::fmt::{Display, Error, Formatter};
-use std::string::ParseError;
+use std::fmt::{Display, Formatter};
 use util::{pmatch, tostr, unescape};
 pub use valid::valid;
 
@@ -1148,55 +1147,28 @@ impl Display for GJSONError {
     }
 }
 
-pub fn set(json: &str, path: &str, value: &str) -> Result<String, GJSONError> {
+// Overwrite a value for an existing path. Creating a new path + value is not
+// yet supported; neither is deleting a path. Both of the latter cases are
+// much more complex as we have to walk through the input JSON and potentially
+// modify/reconstruct parts of it.
+//
+// NOTE: Make sure to pass in a valid JSON value as the overwrite value is
+// injected into the target JSON as-is.
+pub fn set_overwrite(json: &str, path: &str, value: &str) -> Result<String, GJSONError> {
     if !valid(json) {
         return Err(GJSONError { msg: "invalid json".to_string() })
     }
 
     let existing_value = get(json, path);
 
-    if existing_value.exists() {
-        set_overwrite(json, &existing_value, value)
-    } else {
-        set_new(json, path, value)
-    }
-}
-
-pub fn delete(_json: &str, _path: &str) -> Result<String, GJSONError> {
-    // This will have to be implemented by moving backwards so that
-    // we can figure out how long the topmost key is.
-    // Ie. If request is for "a.b.c" path - we need to figure out how large "c"
-    // is. To do that, we must move backwards and go through values in "a.b",
-    // looking for "c". When we find "c" - we'll know its index/position and
-    // so we'll be able to remove it.
-    //
-    // Also, need to take a look at sjson and see how they went about this.
-
-    let v = get(_json, _path);
-    if !v.exists() {
-        return Err(GJSONError{ msg: "Must exist".to_string() });
+    if !existing_value.exists() {
+        return Err(GJSONError { msg: "path does not exist".to_string() })
     }
 
-    let split = _path.split('.').collect::<Vec<&str>>();
-    let v1 = get(_json, split[0]);
-    v1.each(|k, v| {
-        println!("Key '{:?} (index: {:?})' has value '{:?}'", k.json(), k.index(), v.json());
-        true
-    });
-
-
-    Ok(_json.to_string())
-}
-
-fn set_overwrite(json: &str, existing_value: &Value, value: &str) -> Result<String, GJSONError> {
     let value_begin = existing_value.index().unwrap();
     let value_len = existing_value.json().len();
     let value_end = value_begin + value_len;
 
     // Concat it all together
     Ok(format!("{}{}{}", &json[..value_begin], value, &json[value_end..]))
-}
-
-fn set_new(_json: &str, _path: &str, _value: &str) -> Result<String, GJSONError> {
-    Err(GJSONError{ msg: "not implemented".to_string() })
 }

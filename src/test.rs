@@ -36,7 +36,7 @@ fn index() {
 }
 
 #[test]
-fn set_test() {
+fn test_set_overwrite() {
     let json = r#"{
     "boolean_t": true,
     "boolean_f": false,
@@ -66,12 +66,8 @@ fn set_test() {
     "timestamp_rfc3339": "2023-06-29T12:34:56Z"
 }"#;
 
-    let result = match delete(&json, "object.ipv4_address") {
-        Ok(v) => v,
-        Err(e) => panic!("Error: {}", e),
-    };
-
-    println!("Contents: {}", result);
+    let overwritten = set_overwrite(json, "object.ipv4_address", "1.23").unwrap();
+    assert_eq!(valid(&overwritten), true);
 }
 
 #[test]
