@@ -15,6 +15,7 @@ mod valid;
 use path::*;
 use std::cmp::Ordering;
 use std::fmt;
+use std::fmt::{Display, Formatter};
 use util::{pmatch, tostr, unescape};
 pub use valid::valid;
 
@@ -1131,4 +1132,43 @@ pub fn parse<'a>(json: &'a str) -> Value<'a> {
         return proc_value(json, i, Path::default(), true).0;
     }
     return Value::default();
+}
+
+#[derive(Debug)]
+pub struct GJSONError {
+    pub msg: String,
+}
+
+impl std::error::Error for GJSONError {}
+
+impl Display for GJSONError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.msg)
+    }
+}
+
+// Overwrite a value for an existing path. Creating a new path + value is not
+// yet supported; neither is deleting a path. Both of the latter cases are
+// much more complex as we have to walk through the input JSON and potentially
+// modify/reconstruct parts of it.
+//
+// NOTE: Make sure to pass in a valid JSON value as the overwrite value is
+// injected into the target JSON as-is.
+pub fn set_overwrite(json: &str, path: &str, value: &str) -> Result<String, GJSONError> {
+    if !valid(json) {
+        return Err(GJSONError { msg: "invalid json".to_string() })
+    }
+
+    let existing_value = get(json, path);
+
+    if !existing_value.exists() {
+        return Err(GJSONError { msg: "path does not exist".to_string() })
+    }
+
+    let value_begin = existing_value.index().unwrap();
+    let value_len = existing_value.json().len();
+    let value_end = value_begin + value_len;
+
+    // Concat it all together
+    Ok(format!("{}{}{}", &json[..value_begin], value, &json[value_end..]))
 }
