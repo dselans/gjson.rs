@@ -16,6 +16,8 @@ This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) l
 
 The only new func added is `set_overwrite()` - good luck!
 
+<sub>NOTE: Releases for this fork are infrequent and require manual `cargo publish ...`.</sub>
+
 **\</WARNING>**
 
 <p align="center">get json values quickly</p>
