@@ -10,7 +10,15 @@
 <a href="http://tidwall.com/gjson-play"><img src="https://img.shields.io/badge/%F0%9F%8F%90-playground-9900cc.svg?style=flat-square" alt="GJSON Playground"></a>
 </p>
 
-<p align="center">get json values quickly</a></p>
+**\<WARNING>**
+
+This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [snitch-wasm](https://github.com/streamdal/snitch-wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
+
+The only new func added is `set_overwrite()` - good luck!
+
+**\</WARNING>**
+
+<p align="center">get json values quickly</p>
 
 GJSON is a Rust crate that provides a fast and [simple](#get-a-value) way to get values from a json document.
 It has features such as [one line retrieval](#get-a-value), [dot notation paths](#path-syntax), [iteration](#iterate-through-an-object-or-array), and [parsing json lines](#json-lines).
