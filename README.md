@@ -12,7 +12,7 @@
 
 **\<WARNING>**
 
-This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [snitch-wasm](https://github.com/streamdal/snitch-wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
+This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [streamdal/wasm](https://github.com/streamdal/wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
 
 The only new func added is `set_overwrite()` - good luck!
 

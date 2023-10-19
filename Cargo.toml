@@ -1,12 +1,12 @@
 [package]
-name = "snitch-gjson"
+name = "streamdal-gjson"
 version = "0.8.1-with-set"
 authors = ["Josh Baker <joshbaker77@gmail.com>", "Daniel Selans <daniel@streamdal.com>"]
 edition = "2018"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/streamdal/snitch-gjson"
-documentation = "https://docs.rs/snitch-gjson/"
+repository = "https://github.com/streamdal/gjson"
+documentation = "https://docs.rs/streamdal-gjson/"
 description = "Get (and set) JSON values quickly"
 
 [lib]
