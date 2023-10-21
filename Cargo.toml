@@ -1,6 +1,6 @@
 [package]
 name = "streamdal-gjson"
-version = "0.8.1-with-set"
+version = "0.8.1-with-set-rename"
 authors = ["Josh Baker <joshbaker77@gmail.com>", "Daniel Selans <daniel@streamdal.com>"]
 edition = "2018"
 license = "MIT"
