@@ -10,9 +10,9 @@
 <a href="http://tidwall.com/gjson-play"><img src="https://img.shields.io/badge/%F0%9F%8F%90-playground-9900cc.svg?style=flat-square" alt="GJSON Playground"></a>
 </p>
 
-## \<WARNING>
+### \<WARNING>
 
-This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [streamdal/wasm](https://github.com/streamdal/wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
+> This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [streamdal/wasm](https://github.com/streamdal/wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
 
 The only new func added is `set_overwrite()` - good luck!
 
@@ -27,7 +27,7 @@ NOTE: Due to infrequent releases for this fork, this repo does not have automate
 7. `git push origin 0.8.1-my-new-label`
 8. `cargo publish --token <token>`
 
-## \</WARNING>
+### \</WARNING>
 
 <p align="center">get json values quickly</p>
 
