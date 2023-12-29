@@ -11,3 +11,5 @@ description = "Get (and set) JSON values quickly"
 
 [lib]
 doctest = false
+[dependencies]
+bytes = "1.5.0"

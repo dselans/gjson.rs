@@ -36,6 +36,17 @@ fn index() {
 }
 
 #[test]
+fn test_delete_path() {
+    let json = r#"{"object":{"subobject": {"field":" value"   }}}"#;
+
+    let want = r#"{"object":{"subobject": {}}}"#;
+
+    let got = delete_path(json, "object.subobject.field").unwrap();
+
+    assert_eq!(want, got);
+}
+
+#[test]
 fn test_set_overwrite() {
     let json = r#"{
     "boolean_t": true,
