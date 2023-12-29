@@ -1172,3 +1172,131 @@ pub fn set_overwrite(json: &str, path: &str, value: &str) -> Result<String, GJSO
     // Concat it all together
     Ok(format!("{}{}{}", &json[..value_begin], value, &json[value_end..]))
 }
+
+#[inline]
+pub fn get_with_key<'a>(json: &'a str, path: &'a str) -> (Value<'a>, String) {
+    // This is a duplicate of gjson's get() method, but it returns the json key
+    // as the second value in the tuple.
+    // For example, if we give path `object.user.email`, the returned key will be `email`.
+    let mut path = path;
+    let mut lines = false;
+    if path.len() >= 2 && path.as_bytes()[0] == b'.' && path.as_bytes()[1] == b'.' {
+        // json lines
+        path = tostr(&path.as_bytes()[2..]);
+        lines = true;
+    }
+    let path = Path::new(path);
+    let (res, path) = {
+        let json = json.as_bytes();
+        if lines {
+            let res = get_arr(json, 0, true, path);
+            (res.0, res.2)
+        } else if path.is_modifier() {
+            modifiers::exec(json, path)
+        } else if path.is_multipath() {
+            multipath::exec(json, path)
+        } else {
+            let mut i = 0;
+            loop {
+                if i == json.len() {
+                    break (Value::default(), path);
+                }
+                if json[i] <= b' ' {
+                    i += 1;
+                    continue;
+                }
+                if json[i] == b'{' {
+                    let res = get_obj(json, i, path);
+                    break (res.0, res.2);
+                }
+                if json[i] == b'[' {
+                    let res = get_arr(json, i, false, path);
+                    break (res.0, res.2);
+                }
+                break (Value::default(), path);
+            }
+        }
+    };
+    if !path.more() {
+        let p = String::from_utf8(path.comp.to_vec()).expect("Found invalid UTF-8");
+        return (res, p);
+    }
+    let sub_path = tostr(path.extra);
+    let mut json = if res.slice.len() > 0 {
+        crate::get(&res.slice, sub_path)
+    } else {
+        json_into_owned(crate::get(&res.owned, sub_path))
+    };
+    let mut index = None;
+    if let Some(index1) = res.index {
+        if let Some(index2) = json.index {
+            index = Some(index1 + index2);
+        }
+    }
+    json.index = index;
+
+    let p = String::from_utf8(path.comp.to_vec()).expect("Found invalid UTF-8");
+    (json, p)
+}
+
+#[inline]
+pub fn delete_path<'a>(json: &'a str, path: &'a str) -> Result<String, GJSONError> {
+    if !valid(json) {
+        return Err(GJSONError { msg: "invalid json".to_string() })
+    }
+
+    let (existing_value, key) = get_with_key(json, path);
+
+    if !existing_value.exists() {
+        return Err(GJSONError { msg: "path does not exist".to_string() })
+    }
+
+    // Somehow find where the key starts and the value ends
+    let value_begin = existing_value.index().unwrap();
+
+    let key_start = match find_key_start(value_begin, key, json.as_bytes()) {
+        Some(x) => x,
+        None => {
+            return Err(GJSONError { msg: "could not find key".to_string() })
+        }
+    };
+
+
+    let value_len = existing_value.json().len();
+    let mut value_end = value_begin + value_len;
+
+    // Check if value_end + 1 character is a comma, if so, delete that also
+    if value_end + 1 < json.len() && json.as_bytes()[value_end] == b',' {
+        value_end += 1;
+    }
+
+    // Trim both sides of where the "key":"value" was and concat it back together
+    Ok(format!("{}{}",&json[..key_start].trim(), &json[value_end..].trim()))
+}
+
+// Try to find the start of "json_key_name" in the json string
+// TODO: this only supports object keys, we should probably support array elements
+fn find_key_start(start: usize, key: String, data: &[u8]) -> Option<usize> {
+    // Wrap the key in quotes and convert to bytes
+    let target_bytes: Vec<u8> = format!("\"{}\"", key).into_bytes();
+
+    // Iterate over the bytes in reverse order
+    for i in (0..=start).rev() {
+        // Check if there are enough bytes left in the slice to match the target
+        if i + &target_bytes.len() <= data.len() {
+            // Compare the bytes in the reverse order
+
+            let match_found = target_bytes.iter().rev().enumerate().all(|(j, &byte)| {
+               //println!("comparing '{}' to '{}' at {}", byte as char, data[i - j] as char, i-j);
+                byte == data[i - j]
+            });
+
+            if match_found {
+                return Some(i-target_bytes.len()+1);
+            }
+        }
+    }
+
+    // If no match is found, return None
+    None
+}
