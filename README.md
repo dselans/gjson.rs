@@ -12,15 +12,22 @@
 
 ### \<WARNING>
 
-> This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [streamdal/wasm](https://github.com/streamdal/wasm) components. This version of the lib allows you to set JSON values (in a non-optimized way).
+> This is a fork of the official [gjson.rs](https://github.com/tidwall/gjson.rs) library used by [streamdal/wasm](https://github.com/streamdal/streamdal) components. This version of the lib allows you to set JSON values (in a non-optimized way).
 
-The only new func added is `set_overwrite()` - good luck!
+The new functions added are:
+* `set_overwrite()`
+* `delete_path()`
+
+Additionally, the following traits were added:
+
+* `struct Value`: `Debug` and `Clone`
+* `enum Kind`: `Debug`
 
 NOTE: Due to infrequent releases for this fork, this repo does not have automated releases - you will need to perform the release process manually:
 
 1. Make changes to code
 2. Run tests
-3. Figure out new version - you should _try_ to stay under the same version as upstream and only add a label
+3. Figure out new version - you should _try_ to stay under the same version as upstream and only add a label. **But you cannot publish multiple tags for the same version**
 4. Update `Cargo.toml` version with new version
 5. `git commit -a`
 6. `git tag 0.8.1-my-new-label`
