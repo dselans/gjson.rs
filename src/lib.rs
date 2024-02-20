@@ -22,7 +22,7 @@ pub use valid::valid;
 type InfoBits = u32;
 
 /// The kind of json `Value`.
-#[derive(Copy, Clone, Eq)]
+#[derive(Copy, Clone, Eq, Debug)]
 pub enum Kind {
     Null,
     False,
@@ -79,6 +79,7 @@ static KINDMAP: [Kind; 256] = {
 };
 
 /// Value is the JSON value returned from the `get` function.
+#[derive(Debug, Clone)]
 pub struct Value<'a> {
     slice: &'a str,
     owned: String,
