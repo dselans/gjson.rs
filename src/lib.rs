@@ -1290,9 +1290,7 @@ pub fn delete_path<'a>(json: &'a str, path: &'a str) -> Result<String, GJSONErro
                     // Do nothing
                 }
             }
-            if json.as_bytes()[i] == b',' {
-                return Ok(format!("{}{}", &json[..i].trim(), &json[value_end..].trim()))
-            }
+
             i -= 1;
         }
     }
