@@ -1262,14 +1262,44 @@ pub fn delete_path<'a>(json: &'a str, path: &'a str) -> Result<String, GJSONErro
         }
     };
 
-
     let value_len = existing_value.json().len();
     let mut value_end = value_begin + value_len;
 
-    // Check if value_end + 1 character is a comma, if so, delete that also
-    if value_end + 1 < json.len() && json.as_bytes()[value_end] == b',' {
-        value_end += 1;
+    // gJSON returns a trailing comma if we select the first element of an object
+    // but does not for subsequent elements. We need to exclude this trailing comma
+    if json.as_bytes()[value_end] == b',' {
+        value_end += 1
     }
+
+    // When deleting the last element from an object, a trailing comma will be present
+    // still on the previous element. We need to remove it by iterating backwards from the key_start
+    // First check if we're at the end of an object
+    if json.as_bytes()[value_end] == b'}' {
+        let mut i = key_start;
+        while i > 0 {
+            match json.as_bytes()[i] {
+                b'{' | b'[' => {
+                    // We hit the beginning of an object or array, nothing to do
+                    break;
+                },
+                b',' => {
+                    // We hit the trailing comma of a previous element, return JSON without it
+                    return Ok(format!("{}{}", &json[..i].trim(), &json[value_end..].trim()))
+                }
+                _ => {
+                    // Do nothing
+                }
+            }
+            if json.as_bytes()[i] == b',' {
+                return Ok(format!("{}{}", &json[..i].trim(), &json[value_end..].trim()))
+            }
+            i -= 1;
+        }
+    }
+
+
+    eprint!("value_begin: '{}'\n", json.as_bytes()[value_begin] as char);
+    eprint!("value_end: '{}'\n", json.as_bytes()[value_end] as char);
 
     // Trim both sides of where the "key":"value" was and concat it back together
     Ok(format!("{}{}",&json[..key_start].trim(), &json[value_end..].trim()))

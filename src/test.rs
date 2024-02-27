@@ -37,12 +37,28 @@ fn index() {
 
 #[test]
 fn test_delete_path() {
-    let json = r#"{"object":{"subobject": {"field":" value"   }}}"#;
-
+    // Only key in object
+    let json = r#"{"object":{"subobject": {"field":" value"}}}"#;
     let want = r#"{"object":{"subobject": {}}}"#;
-
     let got = delete_path(json, "object.subobject.field").unwrap();
+    assert_eq!(want, got);
 
+    // First key in object
+    let json = r#"{"object":{"subobject": {"field":" value", "some": "other"}}}"#;
+    let want = r#"{"object":{"subobject": {"some": "other"}}}"#;
+    let got = delete_path(json, "object.subobject.field").unwrap();
+    assert_eq!(want, got);
+
+    // Key in middle of object
+    let json = r#"{"object":{"subobject": {"field": "value", "some": "other", "another": "val"}}}"#;
+    let want = r#"{"object":{"subobject": {"field": "value","another": "val"}}}"#;
+    let got = delete_path(json, "object.subobject.some").unwrap();
+    assert_eq!(want, got);
+
+    // // Last key in object
+    let json = r#"{"object":{"subobject": {"field": "value", "some": "other", "another": "val"}}}"#;
+    let want = r#"{"object":{"subobject": {"field": "value", "some": "other"}}}"#;
+    let got = delete_path(json, "object.subobject.another").unwrap();
     assert_eq!(want, got);
 }
 
