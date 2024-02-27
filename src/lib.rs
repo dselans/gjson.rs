@@ -1265,6 +1265,8 @@ pub fn delete_path<'a>(json: &'a str, path: &'a str) -> Result<String, GJSONErro
     let value_len = existing_value.json().len();
     let mut value_end = value_begin + value_len;
 
+    // gJSON returns a trailing comma if we select the first element of an object
+    // but does not for subsequent elements. We need to exclude this trailing comma
     if json.as_bytes()[value_end] == b',' {
         value_end += 1
     }
