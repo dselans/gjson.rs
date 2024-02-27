@@ -1,7 +1,7 @@
 [package]
 name = "streamdal-gjson"
-version = "0.8.3-add-traits"
-authors = ["Josh Baker <joshbaker77@gmail.com>", "Daniel Selans <daniel@streamdal.com>"]
+version = "0.8.4-delete-path-fix"
+authors = ["Josh Baker <joshbaker77@gmail.com>", "Daniel Selans <daniel@streamdal.com>", "Mark Gregan <mark@streamdal.com>"]
 edition = "2018"
 license = "MIT"
 readme = "README.md"
